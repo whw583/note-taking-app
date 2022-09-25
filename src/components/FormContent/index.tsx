@@ -20,8 +20,8 @@ type FormContentProps = {
 const FormContent = ({afterSave,note}:FormContentProps) => {
     const { control, handleSubmit,formState: { errors, }, } = useForm<IFormInput>();
 
-    const onSubmit: SubmitHandler<IFormInput> = data => {
-    const id =    saveNote({...note,...data})
+    const onSubmit: SubmitHandler<IFormInput> = ({title,body}) => {
+        const id =    saveNote({...note,title:title.trim(),body:body.trim()})
         if(afterSave){
             afterSave(id)
         }
@@ -33,12 +33,12 @@ const FormContent = ({afterSave,note}:FormContentProps) => {
                 <FormControl style={{paddingBottom:10}}>
                     <Controller
                         rules={{ validate:(value)=>{
-                           if(!value) return "title is required"
+                           if(!(value.trim())) return "title is required"
                                 return  true;
                             } }}
                         name="title"
                         control={control}
-                        defaultValue={note?.title}
+                        defaultValue={note?.title||""}
                         render={({ field }) => <Input placeholder="enter note title here" {...field} />}
                     />
                     {errors.title&& <FormHelperText  error={true}>{errors.title?.message}</FormHelperText>}
@@ -49,9 +49,9 @@ const FormContent = ({afterSave,note}:FormContentProps) => {
                     <Controller
                         name="body"
                         control={control}
-                        defaultValue={note?.body}
+                        defaultValue={note?.body||""}
                         rules={{ validate:(value)=>{
-                                if(!value) return "body is required"
+                                if(!(value.trim())) return "body is required"
                                 return  true;
                             } }}
                         render={({ field }) => <TextareaAutosize
